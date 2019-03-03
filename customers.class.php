@@ -1,4 +1,42 @@
+
+
+
 <?php
+
+/*
+------------------------------------------------------------
+-                File Name : customers.class.php           - 
+-                Part of Project: prog02 				   -
+------------------------------------------------------------
+-                Written By: George Corser				   -
+-		  Additional Documentation: Matthew Hozeska		   -
+------------------------------------------------------------
+- File Purpose:                                            -
+- This file contains the main php code that the program    -
+- will call. It contains all of the functions for 		   -
+- generating html forms and records, all of the validation -
+- functions, and the sql statements for handling database. - 
+------------------------------------------------------------
+- Program Purpose:                                         -
+-                                                          -
+- This program is an object-orientated crud application.   -
+- It demonstrates a simple create, read, update, and delete-
+- database application. 
+------------------------------------------------------------
+- Global Variable Dictionary:             				   -
+- id - The id tag for all records.						   -
+- name – The name tag for all records.					   -
+- email - The email tag for all records.				   -
+- mobile - The phone number tag for all records.           -
+- noerrors - A flag for determining if all fields were     -
+- entered correctly.									   -
+- nameError - Checks if the name field was left empty.	   -
+- emailError - Checks if the name field was left empty.	   -
+- mobileError - Checks if the name field was left empty.   -
+- title - Displays the html title for the application.     -
+- tableName - Field for the database table name. 		   -
+------------------------------------------------------------
+*/
 
 class Customer { 
     public $id;
@@ -12,6 +50,17 @@ class Customer {
     private $title = "Customer";
     private $tableName = "customers";
     
+	
+	/*
+     * This method generates the html columns, title, and fields for
+	 * the create page.
+     * - Input: User presses create button
+     * - Processing: php generating html functions
+     * - Output: html for the create page
+     * - Precondition: Public variables set (name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: User is redirected to the create page.
+	 */
     function create_record() { // display "create" form
         $this->generate_html_top (1);
         $this->generate_form_group("name", $this->nameError, $this->name, "autofocus");
@@ -20,6 +69,16 @@ class Customer {
         $this->generate_html_bottom (1);
     } // end function create_record()
     
+	/*
+     * This method generates the html columns, title, and fields for
+	 * the read page.
+     * - Input: User presses read button, function accepts the id of record selected.
+     * - Processing: php generating html functions
+     * - Output: html for the read page, with fields already set in read-only
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: User is redirected to the read page.
+	 */
     function read_record($id) { // display "read" form
         $this->select_db_record($id);
         $this->generate_html_top(2);
@@ -29,6 +88,16 @@ class Customer {
         $this->generate_html_bottom(2);
     } // end function read_record()
     
+	/*
+     * This method updates the record selected in the database with the updated
+	 * data that the user entered.
+     * - Input: User can change the field data and presses update button.
+     * - Processing: php generating html functions, SELECT into database using sql.
+     * - Output: html for the update page, with fields already set from selected record.
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: User is redirected to the update page and record is updated in database.
+	 */
     function update_record($id) { // display "update" form
         if($this->noerrors) $this->select_db_record($id);
         $this->generate_html_top(3, $id);
@@ -38,6 +107,15 @@ class Customer {
         $this->generate_html_bottom(3);
     } // end function update_record()
     
+	/*
+     * This method deletes the record selected in the database.
+     * - Input: User selects the delete button on specific record.
+     * - Processing: php generating html functions, SELECT into database using sql.
+     * - Output: html for the delete page, with fields already set from selected record in read-only.
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: User is redirected to the delete page and record is then deleted in database.
+	 */
     function delete_record($id) { // display "read" form
         $this->select_db_record($id);
         $this->generate_html_top(4, $id);
@@ -81,6 +159,16 @@ class Customer {
         }
     } // end function insert_db_record
     
+	/*
+     * This method selects the record from the database using SQL.
+     * - Input: User selects a button that requires this sub function.
+     * - Processing: SQL SELECT * FROM query.
+     * - Output: (none) 
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: name, email, and mobile variables are set to what the user entered
+	 * - and matches from the database.
+	 */
     private function select_db_record($id) {
         $pdo = Database::connect();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -94,6 +182,16 @@ class Customer {
         $this->mobile = $data['mobile'];
     } // function select_db_record()
     
+	/*
+     * This method updates the selected record from the database using SQL.
+     * - Input: User selects the update button that requires this sub function.
+     * - Processing: SQL SELECT * FROM query.
+     * - Output: (none) 
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: name, email, and mobile variables are set to what the user entered
+	 * - and matches from the database.
+	 */
     function update_db_record ($id) {
         $this->id = $id;
         if ($this->fieldsAllValid()) {
@@ -112,6 +210,15 @@ class Customer {
         }
     } // end function update_db_record 
     
+	/*
+     * This method deletes the record from the database using SQL.
+     * - Input: User selects the delete button that requires this sub function.
+     * - Processing: SQL SELECT * FROM query.
+     * - Output: (none) 
+     * - Precondition: Public variables set (id, name, email, mobile)
+     *   and database connection variables are set in database.php.
+     * - Postcondition: Record is deleted in the database.
+	 */
     function delete_db_record($id) {
         $pdo = Database::connect();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -122,6 +229,14 @@ class Customer {
         header("Location: $this->tableName.php");
     } // end function delete_db_record()
     
+	/*
+     * This method generates the HTML title relating to what button the user pushed.
+     * - Input: User selects a button that requires this sub function.
+     * - Processing: php generating HTML code.
+     * - Output: HTML with the title being either create, read, update, or delete.
+     * - Precondition: Public variables set (id, name, email, mobile)
+     * - Postcondition: Title is updated with the related header value.
+	 */
     private function generate_html_top ($fun, $id=null) {
         switch ($fun) {
             case 1: // create
@@ -165,6 +280,14 @@ class Customer {
                     ";
     } // end function generate_html_top()
     
+	/*
+     * This method generates the HTML button underneath the fields relating to what button the user pushed.
+     * - Input: User selects a button that requires this sub function.
+     * - Processing: php generating HTML code.
+     * - Output: HTML with the title being either create, read, update, or delete.
+     * - Precondition: Public variables set (id, name, email, mobile)
+     * - Postcondition: Bottom buttons are updated with the related header value.
+	 */
     private function generate_html_bottom ($fun) {
         switch ($fun) {
             case 1: // create
@@ -198,6 +321,14 @@ class Customer {
                     ";
     } // end function generate_html_bottom()
     
+	/*
+     * This method generates the HTML for all the fields that the user can interact with.
+     * - Input: Fields are generated with appropriate label headers and modifiers.
+     * - Processing: php generating HTML code.
+     * - Output: HTML fields for the user to interact with.
+     * - Precondition: Public variables set (id, name, email, mobile)
+     * - Postcondition: Fields are created.
+	 */
     private function generate_form_group ($label, $labelError, $val, $modifier="") {
         echo "<div class='form-group'";
         echo !empty($labelError) ? ' alert alert-danger ' : '';
@@ -221,6 +352,14 @@ class Customer {
         echo "</div>"; // end div: class='form-group'
     } // end function generate_form_group()
     
+	/*
+     * This method validates all the field entries if they are empty or match a proper email address.
+     * - Input: User presses a bottom button that attempts to either create, or update the record.
+     * - Processing: php if statements, checking each appropriate field for bad data.
+     * - Output: (none)
+     * - Precondition: Public variables set (id, name, email, mobile)
+     * - Postcondition: Fields are validated and can then be created or updated into the database.
+	 */
     private function fieldsAllValid () {
         $valid = true;
         if (empty($this->name)) {
@@ -242,6 +381,14 @@ class Customer {
         return $valid;
     } // end function fieldsAllValid() 
     
+	/*
+     * This method acts as the index.php page which initially displays all records with the crud buttons.
+     * - Input: Database is established and user clicks on customers.php file.
+     * - Processing: Displaying html for the buttons and displays all records from sql selecting into database.
+     * - Output: Main page with records and appropriate buttons.
+     * - Precondition: Database is valid and connection is established.
+     * - Postcondition: Page is generated with all created records.
+	 */
     function list_records() {
         echo "<!DOCTYPE html>
         <html>
@@ -256,7 +403,7 @@ class Customer {
         echo "
             </head>
             <body>
-                <a href='https://github.com/cis355/PhpProject1' target='_blank'>Github</a><br />
+                <a href='https://github.com/mthozesk/crud_oo_complete/' target='_blank'>Github</a><br />
                 <div class='container'>
                     <p class='row'>
                         <h3>$this->title" . "s" . "</h3>

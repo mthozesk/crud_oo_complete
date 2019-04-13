@@ -1,7 +1,13 @@
 <?php
 
+session_start();
+if(!isset($_SESSION["tJHSQRuoNnWUwLRe"])){ // if "user" not set,
+	session_destroy();
+	header('Location: login.html');     // go to login page
+	exit();
+}
+
 // include the class that handles database connections
-//require "../../database/database.php";
 require "../../Prog01_CIS355/database.php";
 
 // include the class containing functions/methods for "customer" table
@@ -15,6 +21,8 @@ if(isset($_GET["id"]))          $id = $_GET["id"];
 if(isset($_POST["name"]))       $cust->name = htmlspecialchars($_POST["name"]);
 if(isset($_POST["email"]))      $cust->email = htmlspecialchars($_POST["email"]);
 if(isset($_POST["mobile"]))     $cust->mobile = htmlspecialchars($_POST["mobile"]);
+// we don't need htmlspecialchars() because password is never displayed in browswer!
+if(isset($_POST["password"]))     $cust->password = $_POST["password"];
 
 // "fun" is short for "function" to be invoked 
 if(isset($_GET["fun"])) $fun = $_GET["fun"];

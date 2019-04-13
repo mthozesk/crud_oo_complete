@@ -1,6 +1,3 @@
-
-
-
 <?php
 
 /*
@@ -43,21 +40,23 @@ class Customer {
     public $name;
     public $email;
     public $mobile;
+	public $password; // text from HTML form
+	public $password_hashed; // hashed password
     private $noerrors = true;
     private $nameError = null;
     private $emailError = null;
     private $mobileError = null;
+	private $passwordError = null;
     private $title = "Customer";
     private $tableName = "customers";
     
-	
 	/*
      * This method generates the html columns, title, and fields for
 	 * the create page.
      * - Input: User presses create button
      * - Processing: php generating html functions
      * - Output: html for the create page
-     * - Precondition: Public variables set (name, email, mobile)
+     * - Precondition: Public variables set (name, email, mobile, password)
      *   and database connection variables are set in database.php.
      * - Postcondition: User is redirected to the create page.
 	 */
@@ -66,9 +65,10 @@ class Customer {
         $this->generate_form_group("name", $this->nameError, $this->name, "autofocus");
         $this->generate_form_group("email", $this->emailError, $this->email);
         $this->generate_form_group("mobile", $this->mobileError, $this->mobile);
+		$this->generate_form_group("password", $this->passwordError, $this->password, "", "password");
         $this->generate_html_bottom (1);
     } // end function create_record()
-    
+
 	/*
      * This method generates the html columns, title, and fields for
 	 * the read page.
@@ -76,9 +76,9 @@ class Customer {
      * - Processing: php generating html functions
      * - Output: html for the read page, with fields already set in read-only
      * - Precondition: Public variables set (id, name, email, mobile)
-     *   and database connection variables are set in database.php.
+     * - and database connection variables are set in database.php.
      * - Postcondition: User is redirected to the read page.
-	 */
+	 */    
     function read_record($id) { // display "read" form
         $this->select_db_record($id);
         $this->generate_html_top(2);
@@ -87,7 +87,7 @@ class Customer {
         $this->generate_form_group("mobile", $this->mobileError, $this->mobile, "disabled");
         $this->generate_html_bottom(2);
     } // end function read_record()
-    
+ 
 	/*
      * This method updates the record selected in the database with the updated
 	 * data that the user entered.
@@ -97,7 +97,7 @@ class Customer {
      * - Precondition: Public variables set (id, name, email, mobile)
      *   and database connection variables are set in database.php.
      * - Postcondition: User is redirected to the update page and record is updated in database.
-	 */
+	 */ 
     function update_record($id) { // display "update" form
         if($this->noerrors) $this->select_db_record($id);
         $this->generate_html_top(3, $id);
@@ -106,7 +106,7 @@ class Customer {
         $this->generate_form_group("mobile", $this->mobileError, $this->mobile);
         $this->generate_html_bottom(3);
     } // end function update_record()
-    
+ 
 	/*
      * This method deletes the record selected in the database.
      * - Input: User selects the delete button on specific record.
@@ -142,13 +142,20 @@ class Customer {
      *   or Create form (if errors)
      */
     function insert_db_record () {
-        if ($this->fieldsAllValid ()) { // validate user input
+        if ($this->fieldsAllValid()) { // validate user input
             // if valid data, insert record into table
             $pdo = Database::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "INSERT INTO $this->tableName (name,email,mobile) values(?, ?, ?)";
+			$this->password_hashed = MD5($this->password);
+			// safe code
+            $sql = "INSERT INTO $this->tableName (name,email,mobile, password_hash) values(?, ?, ?, ?)";
+			// dangerous code
+			//$sql = "INSERT INTO $this->tableName (name,email,mobile) values('$this->name', '$this->email', '$this->mobile')";
             $q = $pdo->prepare($sql);
-            $q->execute(array($this->name,$this->email,$this->mobile));
+			// safe code
+            $q->execute(array($this->name, $this->email, $this->mobile, $this->password_hashed));
+			// dangerous code
+			//$q->execute(array());
             Database::disconnect();
             header("Location: $this->tableName.php"); // go back to "list"
         }
@@ -181,7 +188,7 @@ class Customer {
         $this->email = $data['email'];
         $this->mobile = $data['mobile'];
     } // function select_db_record()
-    
+ 
 	/*
      * This method updates the selected record from the database using SQL.
      * - Input: User selects the update button that requires this sub function.
@@ -191,7 +198,7 @@ class Customer {
      *   and database connection variables are set in database.php.
      * - Postcondition: name, email, and mobile variables are set to what the user entered
 	 * - and matches from the database.
-	 */
+	 */ 
     function update_db_record ($id) {
         $this->id = $id;
         if ($this->fieldsAllValid()) {
@@ -209,7 +216,7 @@ class Customer {
             $this->update_record($id);  // go back to "update" form
         }
     } // end function update_db_record 
-    
+ 
 	/*
      * This method deletes the record from the database using SQL.
      * - Input: User selects the delete button that requires this sub function.
@@ -218,7 +225,7 @@ class Customer {
      * - Precondition: Public variables set (id, name, email, mobile)
      *   and database connection variables are set in database.php.
      * - Postcondition: Record is deleted in the database.
-	 */
+	 */ 
     function delete_db_record($id) {
         $pdo = Database::connect();
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -228,15 +235,15 @@ class Customer {
         Database::disconnect();
         header("Location: $this->tableName.php");
     } // end function delete_db_record()
-    
-	/*
+
+ 	/*
      * This method generates the HTML title relating to what button the user pushed.
      * - Input: User selects a button that requires this sub function.
      * - Processing: php generating HTML code.
      * - Output: HTML with the title being either create, read, update, or delete.
      * - Precondition: Public variables set (id, name, email, mobile)
      * - Postcondition: Title is updated with the related header value.
-	 */
+	 */   
     private function generate_html_top ($fun, $id=null) {
         switch ($fun) {
             case 1: // create
@@ -279,7 +286,7 @@ class Customer {
                         <form class='form-horizontal' action='$this->tableName.php?fun=$funNext' method='post'>                        
                     ";
     } // end function generate_html_top()
-    
+
 	/*
      * This method generates the HTML button underneath the fields relating to what button the user pushed.
      * - Input: User selects a button that requires this sub function.
@@ -287,7 +294,7 @@ class Customer {
      * - Output: HTML with the title being either create, read, update, or delete.
      * - Precondition: Public variables set (id, name, email, mobile)
      * - Postcondition: Bottom buttons are updated with the related header value.
-	 */
+	 */    
     private function generate_html_bottom ($fun) {
         switch ($fun) {
             case 1: // create
@@ -329,15 +336,15 @@ class Customer {
      * - Precondition: Public variables set (id, name, email, mobile)
      * - Postcondition: Fields are created.
 	 */
-    private function generate_form_group ($label, $labelError, $val, $modifier="") {
-        echo "<div class='form-group'";
+	 private function generate_form_group ($label, $labelError, $val, $modifier="", $fieldType="text") {
+        echo "<div class='form-group";
         echo !empty($labelError) ? ' alert alert-danger ' : '';
         echo "'>";
         echo "<label class='control-label'>$label &nbsp;</label>";
         //echo "<div class='controls'>";
         echo "<input "
             . "name='$label' "
-            . "type='text' "
+            . "type='$fieldType' "
             . "$modifier "
             . "placeholder='$label' "
             . "value='";
@@ -351,15 +358,15 @@ class Customer {
         //echo "</div>"; // end div: class='controls'
         echo "</div>"; // end div: class='form-group'
     } // end function generate_form_group()
-    
-	/*
+
+ 	/*
      * This method validates all the field entries if they are empty or match a proper email address.
      * - Input: User presses a bottom button that attempts to either create, or update the record.
      * - Processing: php if statements, checking each appropriate field for bad data.
      * - Output: (none)
      * - Precondition: Public variables set (id, name, email, mobile)
      * - Postcondition: Fields are validated and can then be created or updated into the database.
-	 */
+	 */   
     private function fieldsAllValid () {
         $valid = true;
         if (empty($this->name)) {
@@ -379,8 +386,9 @@ class Customer {
             $valid = false;
         }
         return $valid;
+		
     } // end function fieldsAllValid() 
-    
+
 	/*
      * This method acts as the index.php page which initially displays all records with the crud buttons.
      * - Input: Database is established and user clicks on customers.php file.
@@ -388,7 +396,7 @@ class Customer {
      * - Output: Main page with records and appropriate buttons.
      * - Precondition: Database is valid and connection is established.
      * - Postcondition: Page is generated with all created records.
-	 */
+	 */    
     function list_records() {
         echo "<!DOCTYPE html>
         <html>
@@ -403,14 +411,15 @@ class Customer {
         echo "
             </head>
             <body>
-                <a href='https://github.com/mthozesk/crud_oo_complete/' target='_blank'>Github</a><br />
+                <a href='https://github.com/cis355/PhpProject1' target='_blank'>Github</a><br />
                 <div class='container'>
                     <p class='row'>
                         <h3>$this->title" . "s" . "</h3>
                     </p>
                     <p>
                         <a href='$this->tableName.php?fun=display_create_form' class='btn btn-success'>Create</a>
-                    </p>
+						<a href='logout.php' class='btn btn-warning'>Logout</a> 
+					</p>
                     <div class='row'>
                         <table class='table table-striped table-bordered'>
                             <thead>

@@ -66,6 +66,8 @@ class Customer {
         $this->generate_form_group("email", $this->emailError, $this->email);
         $this->generate_form_group("mobile", $this->mobileError, $this->mobile);
 		$this->generate_form_group("password", $this->passwordError, $this->password, "", "password");
+		//echo <a href='upload02.html' class='btn btn-success'>Upload02</a>	
+		//$this->generate_form_group("upload", "", "", "", "upload");
         $this->generate_html_bottom (1);
     } // end function create_record()
 
@@ -235,7 +237,7 @@ class Customer {
         Database::disconnect();
         header("Location: $this->tableName.php");
     } // end function delete_db_record()
-
+	
  	/*
      * This method generates the HTML title relating to what button the user pushed.
      * - Input: User selects a button that requires this sub function.
@@ -262,7 +264,8 @@ class Customer {
                 echo "Error: Invalid function: generate_html_top()"; 
                 exit();
                 break;
-        }
+        } // end function generate_html_top()
+		
         echo "<!DOCTYPE html>
         <html>
             <head>
@@ -314,10 +317,12 @@ class Customer {
                 exit();
                 break;
         }
+		
         echo " 
                             <div class='form-actions'>
                                 $funButton
                                 <a class='btn btn-secondary' href='$this->tableName.php'>Back</a>
+								<a href='upload02.html' class='btn btn-success'>Upload02</a>
                             </div>
                         </form>
                     </div>
@@ -411,7 +416,10 @@ class Customer {
         echo "
             </head>
             <body>
-                <a href='https://github.com/cis355/PhpProject1' target='_blank'>Github</a><br />
+                <a href='https://github.com/mthozesk/crud_oo_complete' target='_blank'>Github</a><br />
+				<a href='http://csis.svsu.edu/~mthozesk/cis355wi19/customers/prog02_Diagram.jpg' target='_blank'>Diagram1</a><br />
+				<a href='http://csis.svsu.edu/~mthozesk/cis355wi19/customers/prog03_Diagram.jpg' target='_blank'>Diagram2</a><br />
+				<a href='http://mthozesk.000webhostapp.com/Prog04/' target='_blank'>Prog04-000webhost</a><br />
                 <div class='container'>
                     <p class='row'>
                         <h3>$this->title" . "s" . "</h3>
@@ -419,6 +427,8 @@ class Customer {
                     <p>
                         <a href='$this->tableName.php?fun=display_create_form' class='btn btn-success'>Create</a>
 						<a href='logout.php' class='btn btn-warning'>Logout</a> 
+						<a href='upload01.html' class='btn btn-success'>Upload01</a>
+						
 					</p>
                     <div class='row'>
                         <table class='table table-striped table-bordered'>
@@ -432,6 +442,7 @@ class Customer {
                             </thead>
                             <tbody>
                     ";
+		//		<a href='upload02.html' class='btn btn-success'>Upload02</a>	
         $pdo = Database::connect();
         $sql = "SELECT * FROM $this->tableName ORDER BY id DESC";
         foreach ($pdo->query($sql) as $row) {

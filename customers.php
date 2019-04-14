@@ -4,8 +4,8 @@ session_start();
 header('Access-Control-Allow-Origin: *');
 
 // include the class that handles database connections
-//require "http://csis.svsu.edu/~mthozesk/Prog01_CIS355/database.php";
-require "../../Prog01_CIS355/database.php";
+require "http://csis.svsu.edu/~mthozesk/Prog01_CIS355/database.php";
+//require "../../Prog01_CIS355/database.php";
 // include the class containing functions/methods for "customer" table
 // Note: this application uses "customer" table, not "cusotmers" table
 require "http://csis.svsu.edu/~mthozesk/cis355wi19/temp/customers.class.php";

@@ -8,6 +8,7 @@
  */
 // Start or resume session, and create: $_SESSION[] array
 session_start(); 
+header('Access-Control-Allow-Origin: *');
 // include the class that handles database connections
 require "../../Prog01_CIS355/database.php";
 

@@ -34,7 +34,7 @@
 - tableName - Field for the database table name. 		   -
 ------------------------------------------------------------
 */
-
+header('Access-Control-Allow-Origin: *');
 class Customer { 
     public $id;
     public $name;

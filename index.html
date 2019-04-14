@@ -1,24 +1,18 @@
 <!DOCTYPE html>
-<html>
-<body onload="loadDoc()";>
-
-<div id="demo">
-</div>
-
-<script>
-function loadDoc() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("demo").innerHTML =
-      this.responseText;
-    }
-  };
-  xhttp.open("GET", "customers.php", true);
-  //xhttp.open("GET", "http://csis.svsu.edu/~mthozesk/cis355wi19/temp/customers.html", true);
-  xhttp.send();
-}
-</script>
-
+<html lang="en">
+<head>
+ <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-
+FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+ <meta charset='UTF-8'>
+ <link
+href='https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css'
+rel='stylesheet'>
+ <script
+src='https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js'></script
+>
+ <script src = "globalFunctions.js"></script>
+ <style>label {width: 5em;}</style>
+</head>
+<body onload="window.location.href = 'customers.html' ">
 </body>
 </html>
